@@ -1,20 +1,15 @@
 package controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import model.Customer;
+import model.tm.CustomerTm;
 
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ResourceBundle;
+import java.sql.*;
 
 public class CustomerFormController {
 
@@ -49,12 +44,50 @@ public class CustomerFormController {
     private TextField txtSalary;
 
     public void initialize(){
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        colSalary.setCellValueFactory(new PropertyValueFactory<>("salary"));
+        colOption.setCellValueFactory(new PropertyValueFactory<>("btn"));
+        loadCustomerTable();
+    }
 
+    private void loadCustomerTable() {
+        ObservableList<CustomerTm> tmList = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM customer";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/thogakade", "root", "2791");
+            Statement stm = connection.createStatement();
+            ResultSet result = stm.executeQuery(sql);
+
+            while (result.next()){
+                Button btn = new Button("Delete");
+                CustomerTm c = new CustomerTm(
+                        result.getString(1),
+                        result.getString(2),
+                        result.getString(3),
+                        result.getDouble(4),
+                        btn
+                );
+                btn.setOnAction(actionEvent -> {
+                    deleteCustomer(c.getId());
+                });
+
+                tmList.add(c);
+            }
+            connection.close();
+
+            tblCustomer.setItems(tmList);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void reloadButtonOnAction(ActionEvent event) {
-
+        loadCustomerTable();
     }
 
     @FXML
@@ -73,9 +106,32 @@ public class CustomerFormController {
             int result = stm.executeUpdate(sql);
             if (result>0){
                 new Alert(Alert.AlertType.INFORMATION, "Customer Saved!").show();
+            }else{
+                new Alert(Alert.AlertType.ERROR,"Something went wrong!").show();
             }
+            connection.close();
 
         }catch (ClassNotFoundException | SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteCustomer(String id) {
+        String sql = "DELETE from customer WHERE id='"+id+"'";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/thogakade", "root", "2791");
+            Statement stm = connection.createStatement();
+            int result = stm.executeUpdate(sql);
+            if (result>0){
+                new Alert(Alert.AlertType.INFORMATION,"Customer Deleted!").show();
+                loadCustomerTable();
+            }else{
+                new Alert(Alert.AlertType.ERROR,"Something went wrong!").show();
+            }
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
