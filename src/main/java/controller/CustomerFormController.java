@@ -29,7 +29,7 @@ public class CustomerFormController {
     private TableColumn colSalary;
 
     @FXML
-    private TableView tblCustomer;
+    private TableView<CustomerTm> tblCustomer;
 
     @FXML
     private TextField txtAddress;
@@ -50,6 +50,20 @@ public class CustomerFormController {
         colSalary.setCellValueFactory(new PropertyValueFactory<>("salary"));
         colOption.setCellValueFactory(new PropertyValueFactory<>("btn"));
         loadCustomerTable();
+
+        tblCustomer.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            setData(newValue);
+        });
+    }
+
+    private void setData(CustomerTm newValue) {
+        if (newValue != null) {
+            txtId.setEditable(false);
+            txtId.setText(newValue.getId());
+            txtName.setText(newValue.getName());
+            txtAddress.setText(newValue.getAddress());
+            txtSalary.setText(String.valueOf(newValue.getSalary()));
+        }
     }
 
     private void loadCustomerTable() {
@@ -88,6 +102,17 @@ public class CustomerFormController {
     @FXML
     void reloadButtonOnAction(ActionEvent event) {
         loadCustomerTable();
+        tblCustomer.refresh();
+        clearFields();
+    }
+
+    private void clearFields() {
+        tblCustomer.refresh();
+        txtSalary.clear();
+        txtAddress.clear();
+        txtName.clear();
+        txtId.clear();
+        txtId.setEditable(true);
     }
 
     @FXML
@@ -106,13 +131,17 @@ public class CustomerFormController {
             int result = stm.executeUpdate(sql);
             if (result>0){
                 new Alert(Alert.AlertType.INFORMATION, "Customer Saved!").show();
+                loadCustomerTable();
+                clearFields();
             }else{
                 new Alert(Alert.AlertType.ERROR,"Something went wrong!").show();
             }
             connection.close();
 
+        }catch (SQLIntegrityConstraintViolationException ex){
+            new Alert(Alert.AlertType.ERROR,"Duplicate Entry").show();
         }catch (ClassNotFoundException | SQLException e){
-            e.printStackTrace();
+            System.out.println();
         }
     }
 
@@ -139,7 +168,27 @@ public class CustomerFormController {
 
     @FXML
     void updateButtonOnAction(ActionEvent event) {
+        Customer c = new Customer(txtId.getText(),
+                txtName.getText(),
+                txtAddress.getText(),
+                Double.parseDouble(txtSalary.getText())
+        );
+        String sql = "UPDATE customer SET name='"+c.getName()+"', address='"+c.getAddress()+"', salary="+c.getSalary()+" WHERE id='"+c.getId()+"'";
 
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/thogakade", "root", "2791");
+            Statement stm = connection.createStatement();
+            int result = stm.executeUpdate(sql);
+            if (result>0){
+                new Alert(Alert.AlertType.INFORMATION,"Customer "+c.getId()+" Updated!").show();
+                loadCustomerTable();
+                clearFields();
+            }
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }
