@@ -18,8 +18,11 @@ import java.util.Objects;
 public class PlaceOrderFormController {
 
 
+    @FXML
     private AnchorPane pane;
+    @FXML
     private Label lblTotal;
+    @FXML
     private JFXComboBox cmbId;
     @FXML
     private JFXComboBox<?> cmbID;
