@@ -17,6 +17,7 @@ public class DashboardFormController {
         try {
             stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/CustomerForm.fxml")))));
             stage.show();
+            stage.setTitle("Customer Form");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -27,6 +28,8 @@ public class DashboardFormController {
         try {
             stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/ItemForm.fxml")))));
             stage.setResizable(true);
+            stage.setTitle("Item Form");
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
