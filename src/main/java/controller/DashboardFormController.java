@@ -39,4 +39,18 @@ public class DashboardFormController {
             e.printStackTrace();
         }
     }
+
+    public void placeOrderButtonOnAction(ActionEvent actionEvent) {
+        Stage stage = (Stage) pane.getScene().getWindow();
+        try {
+            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/PlaceOrderForm.fxml")))));
+            stage.setResizable(true);
+            stage.setTitle("Place Order Form");
+            stage.centerOnScreen();
+
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
