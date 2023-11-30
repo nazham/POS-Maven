@@ -119,7 +119,7 @@ public class ItemFormController {
         try {
             PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
             pstm.setString(1, code);
-            int result = pstm.executeUpdate(sql);
+            int result = pstm.executeUpdate();
             if (result>0){
                 new Alert(Alert.AlertType.INFORMATION,"Item Deleted!").show();
                 loadItemTable();
@@ -138,6 +138,7 @@ public class ItemFormController {
         try {
             stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/DashboardForm.fxml")))));
             stage.show();
+            stage.centerOnScreen();
         } catch (IOException e) {
             e.printStackTrace();
         }
