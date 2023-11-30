@@ -18,7 +18,6 @@ import javafx.scene.control.Alert;
 
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
@@ -68,8 +67,7 @@ public class ItemFormController {
     @FXML
     private TreeTableColumn<?, ?> colOption;
 
-    @FXML
-    private JFXButton backBtn;
+
 
     public void initialize(){
         colCode.setCellValueFactory(new TreeItemPropertyValueFactory<>("code"));
@@ -78,6 +76,25 @@ public class ItemFormController {
         colQty.setCellValueFactory(new TreeItemPropertyValueFactory<>("qty"));
         colOption.setCellValueFactory(new TreeItemPropertyValueFactory<>("btn"));
         loadItemTable();
+
+        tblItem.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+            try {
+                setData(newValue.getValue());
+            } catch (NullPointerException ex) {
+                ex.printStackTrace();
+            }
+
+        });
+    }
+
+    private void setData(ItemTm newValue) {
+        if (newValue != null) {
+            txtCode.setEditable(false);
+            txtCode.setText(newValue.getCode());
+            txtDesc.setText(newValue.getDesc());
+            txtUnitPrice.setText(String.valueOf(newValue.getUnitPrice()));
+            txtQty.setText(String.valueOf(newValue.getQty()));
+        }
     }
 
     private void loadItemTable() {
@@ -123,6 +140,7 @@ public class ItemFormController {
             if (result>0){
                 new Alert(Alert.AlertType.INFORMATION,"Item Deleted!").show();
                 loadItemTable();
+                clearFields();
             }else{
                 new Alert(Alert.AlertType.ERROR,"Something went wrong!").show();
             }
@@ -186,7 +204,35 @@ public class ItemFormController {
 
     @FXML
     void updateButtonOnAction(ActionEvent event) {
+        ItemDto dto = new ItemDto(txtCode.getText(),
+                txtDesc.getText(),
+                Double.parseDouble(txtUnitPrice.getText()),
+                Integer.parseInt(txtQty.getText())
+        );
+        String sql = "UPDATE Item SET Description=?, UnitPrice=?, qtyOnHand=? WHERE code=?";
 
+        try {
+            PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+            pstm.setString(1, dto.getDesc());
+            pstm.setDouble(2, dto.getUnitPrice());
+            pstm.setInt(3, dto.getQty());
+            pstm.setString(4, dto.getCode());
+
+            int result = pstm.executeUpdate();
+            if (result>0){
+                new Alert(Alert.AlertType.INFORMATION, "Item Updated!").show();
+                loadItemTable();
+                clearFields();
+            }else{
+                new Alert(Alert.AlertType.ERROR,"Something went wrong!").show();
+            }
+
+
+        }catch (SQLIntegrityConstraintViolationException ex){
+            new Alert(Alert.AlertType.ERROR,"Duplicate Entry").show();
+        }catch (ClassNotFoundException | SQLException e){
+            System.out.println();
+        }
     }
 
 }
