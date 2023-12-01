@@ -158,17 +158,15 @@ public class PlaceOrderFormController {
 
             boolean isExist = false;
 
-            for (OrderTm order:tmList){
-                if (order.getCode().equals(tm.getCode())){
-                    order.setQty(order.getQty()+ tm.getQty());
-                    order.setAmount(order.getAmount()+ tm.getAmount());
-                    isExist=true;
-                    tot+=tm.getAmount();
-                }else {
-                    tot+=tm.getAmount();
+            for (OrderTm order:tmList) {
+                if (order.getCode().equals(tm.getCode())) {
+                    order.setQty(order.getQty() + tm.getQty());
+                    order.setAmount(order.getAmount() + tm.getAmount());
+                    isExist = true;
+                    tot += tm.getAmount();
+
                 }
             }
-
             if (!isExist){
                 tmList.add(tm);
                 tot+=tm.getAmount();
