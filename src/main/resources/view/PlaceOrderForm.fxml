@@ -25,21 +25,21 @@
         <Label layoutX="252.0" layoutY="28.0" prefHeight="18.0" prefWidth="78.0" text="Name" />
         <Label layoutX="467.0" layoutY="99.0" prefHeight="18.0" prefWidth="78.0" text="Unit Price" />
         <Label layoutX="644.0" layoutY="99.0" prefHeight="18.0" prefWidth="78.0" text="Buying QTY" />
-        <JFXButton fx:id="btnAddToCart" layoutX="709.0" layoutY="179.0" prefHeight="30.0" prefWidth="106.0" style="-fx-background-color: #d7ba44;" text="Add to Cart" textFill="WHITE">
+        <JFXButton layoutX="709.0" layoutY="179.0" onAction="#addToCartOnAction" prefHeight="30.0" prefWidth="106.0" style="-fx-background-color: #d7ba44;" text="Add to Cart" textFill="WHITE">
             <font>
                 <Font name="System Bold" size="14.0" />
             </font>
         </JFXButton>
-        <JFXTreeTableView layoutX="43.0" layoutY="225.0" prefHeight="295.0" prefWidth="762.0">
+        <JFXTreeTableView fx:id="tblOrder" layoutX="43.0" layoutY="225.0" prefHeight="295.0" prefWidth="762.0">
             <columns>
-                <TreeTableColumn prefWidth="108.79999542236328" text="Code" />
-                <TreeTableColumn prefWidth="228.79998779296875" text="Description" />
-                <TreeTableColumn fx:id="tblOrder" prefWidth="95.20001220703125" text="QTY" />
-                <TreeTableColumn prefWidth="175.99996948242188" text="Amount" />
-                <TreeTableColumn prefWidth="154.4000244140625" text="Option" />
+                <TreeTableColumn fx:id="colCode" prefWidth="108.79999542236328" text="Code" />
+                <TreeTableColumn fx:id="colDesc" prefWidth="228.79998779296875" text="Description" />
+                <TreeTableColumn fx:id="colQty" prefWidth="95.20001220703125" text="QTY" />
+                <TreeTableColumn fx:id="colAmount" prefWidth="175.99996948242188" text="Amount" />
+                <TreeTableColumn fx:id="colOption" prefWidth="154.4000244140625" text="Option" />
             </columns>
         </JFXTreeTableView>
-        <JFXButton fx:id="btnPlaceOrder" layoutX="709.0" layoutY="535.0" prefHeight="43.0" prefWidth="106.0" style="-fx-background-color: #fa7178;" text="Place Order" textFill="WHITE">
+        <JFXButton layoutX="709.0" layoutY="535.0" onAction="#placeOrderOnAction" prefHeight="43.0" prefWidth="106.0" style="-fx-background-color: #fa7178;" text="Place Order" textFill="WHITE">
             <font>
                 <Font name="System Bold" size="14.0" />
             </font>

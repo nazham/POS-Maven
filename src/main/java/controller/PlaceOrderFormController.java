@@ -1,10 +1,10 @@
 package controller;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
+import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import dto.CustomerDto;
 import dto.ItemDto;
+import dto.tm.OrderTm;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.CustomerModel;
@@ -31,6 +32,12 @@ public class PlaceOrderFormController {
 
     public JFXComboBox cmbCode;
     public JFXComboBox cmbId;
+    public TreeTableColumn colCode;
+    public TreeTableColumn colDesc;
+    public TreeTableColumn colQty;
+    public TreeTableColumn colAmount;
+    public TreeTableColumn colOption;
+    public JFXTreeTableView<OrderTm> tblOrder;
     @FXML
     private AnchorPane pane;
     @FXML
@@ -48,14 +55,6 @@ public class PlaceOrderFormController {
     @FXML
     private JFXTextField txtQty;
 
-    @FXML
-    private JFXButton btnAddToCart;
-
-    @FXML
-    private TreeTableColumn<?, ?> tblOrder;
-
-    @FXML
-    private JFXButton btnPlaceOrder;
 
     private List<CustomerDto> customers = new ArrayList<>();
     private List<ItemDto> items = new ArrayList<>();
@@ -63,7 +62,17 @@ public class PlaceOrderFormController {
     private CustomerModel customerModel = new CustomerModelImpl();
     private ItemModel itemModel = new ItemModelImpl();
 
+    private ObservableList<OrderTm> tmList = FXCollections.observableArrayList();
+    private double tot =0;
     public void initialize(){
+        colCode.setCellValueFactory(new TreeItemPropertyValueFactory<>("code"));
+        colDesc.setCellValueFactory(new TreeItemPropertyValueFactory<>("desc"));
+        colQty.setCellValueFactory(new TreeItemPropertyValueFactory<>("qty"));
+        colAmount.setCellValueFactory(new TreeItemPropertyValueFactory<>("amount"));
+        colOption.setCellValueFactory(new TreeItemPropertyValueFactory<>("btn"));
+
+
+
         loadCustomerIds();
         loadItemCodes();
 
@@ -126,5 +135,61 @@ public class PlaceOrderFormController {
             e.printStackTrace();
         }
     }
+
+    public void addToCartOnAction(ActionEvent actionEvent) {
+        try {
+            double amount = itemModel.getItem(cmbCode.getValue().toString()).getUnitPrice()* Integer.parseInt(txtQty.getText());
+            JFXButton btn = new JFXButton("Delete");
+
+            OrderTm tm = new OrderTm(
+                    cmbCode.getValue().toString(),
+                    txtDesc.getText(),
+                    Integer.parseInt(txtQty.getText()),
+                    amount,
+                    btn
+            );
+
+            btn.setOnAction(actionEvent1 -> {
+                tmList.remove(tm);
+                tot -= tm.getAmount();
+                tblOrder.refresh();
+                lblTotal.setText(String.format("%.2f", tot));
+            });
+
+            boolean isExist = false;
+
+            for (OrderTm order:tmList){
+                if (order.getCode().equals(tm.getCode())){
+                    order.setQty(order.getQty()+ tm.getQty());
+                    order.setAmount(order.getAmount()+ tm.getAmount());
+                    isExist=true;
+                    tot+=tm.getAmount();
+                }else {
+                    tot+=tm.getAmount();
+                }
+            }
+
+            if (!isExist){
+                tmList.add(tm);
+                tot+=tm.getAmount();
+            }
+
+            RecursiveTreeItem<OrderTm> treeObject = new RecursiveTreeItem<OrderTm>(tmList, RecursiveTreeObject::getChildren);
+            tblOrder.setRoot(treeObject);
+            tblOrder.setShowRoot(false);
+
+            lblTotal.setText(String.format("%.2f", tot));
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void placeOrderOnAction(ActionEvent actionEvent) {
+    }
+
 
 }
