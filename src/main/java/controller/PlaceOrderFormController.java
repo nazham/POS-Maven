@@ -4,6 +4,7 @@ import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import dto.CustomerDto;
 import dto.ItemDto;
+import dto.OrderDetailsDto;
 import dto.OrderDto;
 import dto.tm.OrderTm;
 import javafx.collections.FXCollections;
@@ -12,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
@@ -26,6 +28,8 @@ import model.impl.OrderModelImpl;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -212,10 +216,36 @@ public class PlaceOrderFormController {
     }
 
     public void placeOrderOnAction(ActionEvent actionEvent) {
-        if (!tmList.isEmpty()){
-         //   orderModel.saveOrder();
+        List<OrderDetailsDto> list = new ArrayList<>();
+        for (OrderTm tm:tmList) {
+            list.add(new OrderDetailsDto(
+                    lblOrderId.getText(),
+                    tm.getCode(),
+                    tm.getQty(),
+                    tm.getAmount()/ tm.getQty()
+            ));
         }
+//        if (!tmList.isEmpty()){
+            boolean isSaved = false;
+            try {
+                isSaved = orderModel.saveOrder(new OrderDto(
+                        lblOrderId.getText(),
+                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-dd")),
+                        cmbId.getValue().toString(),
+                        list
+                   ));
+                if (isSaved){
+                    new Alert(Alert.AlertType.INFORMATION, "Order Saved!").show();
+                }else {
+                    new Alert(Alert.AlertType.ERROR, "Something went wrong!").show();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
+//        }
     }
-
-
 }

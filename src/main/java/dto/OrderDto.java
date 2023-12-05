@@ -13,6 +13,5 @@ public class OrderDto {
     private String orderId;
     private String date;
     private String cusId;
-    private List<OrderDetailsDto> orderDetails;
-
+    private List<OrderDetailsDto> list;
 }
