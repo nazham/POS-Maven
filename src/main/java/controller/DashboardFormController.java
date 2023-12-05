@@ -15,7 +15,7 @@ public class DashboardFormController {
     public void customerButtonOnAction(ActionEvent actionEvent) {
         Stage stage = (Stage) pane.getScene().getWindow();
         try {
-            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/CustomerForm.fxml")))));
+            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/CustomerForm.fxml")))));
 
             stage.setTitle("Customer Form");
             stage.centerOnScreen();
@@ -29,7 +29,7 @@ public class DashboardFormController {
     public void itemButtonOnAction(ActionEvent actionEvent) {
         Stage stage = (Stage) pane.getScene().getWindow();
         try {
-            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/ItemForm.fxml")))));
+            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/ItemForm.fxml")))));
             stage.setResizable(true);
             stage.setTitle("Item Form");
             stage.centerOnScreen();
@@ -43,7 +43,7 @@ public class DashboardFormController {
     public void placeOrderButtonOnAction(ActionEvent actionEvent) {
         Stage stage = (Stage) pane.getScene().getWindow();
         try {
-            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../view/PlaceOrderForm.fxml")))));
+            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/PlaceOrderForm.fxml")))));
             stage.setResizable(true);
             stage.setTitle("Place Order Form");
             stage.centerOnScreen();
