@@ -8,6 +8,8 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import db.DBConnection;
 import dto.ItemDto;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,6 +30,7 @@ import dto.tm.ItemTm;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class ItemFormController {
 
@@ -84,6 +87,19 @@ public class ItemFormController {
                 ex.printStackTrace();
             }
 
+        });
+
+        txtSearch.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String newValue) {
+                tblItem.setPredicate(new Predicate<TreeItem<ItemTm>>() {
+                    @Override
+                    public boolean test(TreeItem<ItemTm> treeItem) {
+                        return treeItem.getValue().getCode().contains(newValue) ||
+                                treeItem.getValue().getDesc().contains(newValue);
+                    }
+                });
+            }
         });
     }
 
