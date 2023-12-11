@@ -1,4 +1,4 @@
-package dto;
+package entity;
 
 import lombok.*;
 
@@ -8,12 +8,9 @@ import lombok.*;
 @Getter
 @Setter
 
-
-public class CustomerDto {
+public class Customer {
     private String id;
     private String name;
     private String address;
     private double salary;
-
-
 }
