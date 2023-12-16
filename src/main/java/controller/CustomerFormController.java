@@ -56,7 +56,7 @@ public class CustomerFormController {
     @FXML
     private TextField txtSalary;
 
-    private CustomerBo<CustomerDto> customerBo = new CustomerBoImpl();
+    private CustomerBo customerBo = new CustomerBoImpl();
 
     public void initialize(){
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
