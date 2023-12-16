@@ -1,11 +1,11 @@
-package dao;
+package dao.custom;
 
 import dto.ItemDto;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public interface ItemModel {
+public interface ItemDao {
     boolean saveItem(ItemDto itemDto);
     boolean updateItem(ItemDto itemDto);
     boolean deleteItem(String code);
