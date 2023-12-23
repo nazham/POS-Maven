@@ -8,7 +8,7 @@ public class BoFactory {
     private BoFactory(){
     }
     public static BoFactory getInstance(){
-        return boFactory!=null? boFactory:(boFactory=new BoFactory());
+        return boFactory!=null? boFactory:(boFactory = new BoFactory());
     }
 
     public <T extends SuperBo>T getBo(BoType type){
