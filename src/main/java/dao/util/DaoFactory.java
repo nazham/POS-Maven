@@ -1,7 +1,5 @@
 package dao.util;
 
-import bo.SuperBo;
-import bo.custom.impl.CustomerBoImpl;
 import dao.SuperDao;
 import dao.custom.impl.CustomerDaoImpl;
 import dao.custom.impl.ItemDaoImpl;

@@ -1,12 +1,10 @@
 package dao.custom.impl;
 
-import dao.util.CrudUtil;
-
-import dto.CustomerDto;
 import dao.custom.CustomerDao;
+import dao.util.CrudUtil;
+import dto.CustomerDto;
 import entity.Customer;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
