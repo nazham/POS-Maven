@@ -1,7 +1,9 @@
 package controller;
 
 import bo.custom.CustomerBo;
+import bo.custom.ItemBo;
 import bo.custom.impl.CustomerBoImpl;
+import bo.custom.impl.ItemBoImpl;
 import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import dto.CustomerDto;
@@ -70,6 +72,7 @@ public class PlaceOrderFormController {
     private List<ItemDto> items = new ArrayList<>();
 
     private CustomerBo customerBo = new CustomerBoImpl();
+    private ItemBo itemBo = new ItemBoImpl();
     private ItemDao itemDao = new ItemDaoImpl();
     private OrderDao orderDao = new OrderDaoImpl();
 
@@ -124,7 +127,7 @@ public class PlaceOrderFormController {
 
     private void loadItemCodes() {
         try {
-            items = itemDao.allItems();
+            items = itemBo.allItems();
             ObservableList<String> list = FXCollections.observableArrayList();
             for (ItemDto dto: items){
                 list.add(dto.getCode());

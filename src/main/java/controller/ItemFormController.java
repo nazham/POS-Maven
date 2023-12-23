@@ -1,13 +1,19 @@
 package controller;
 
+import bo.BoFactory;
+import bo.custom.CustomerBo;
+import bo.custom.ItemBo;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import dao.util.BoType;
 import db.DBConnection;
+import dto.CustomerDto;
 import dto.ItemDto;
 
+import dto.tm.CustomerTm;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -18,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
@@ -29,6 +36,7 @@ import dto.tm.ItemTm;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -70,7 +78,7 @@ public class ItemFormController {
     @FXML
     private TreeTableColumn<?, ?> colOption;
 
-
+    private ItemBo itemBo = BoFactory.getInstance().getBo(BoType.ITEM);
 
     public void initialize(){
         colCode.setCellValueFactory(new TreeItemPropertyValueFactory<>("code"));
@@ -80,14 +88,19 @@ public class ItemFormController {
         colOption.setCellValueFactory(new TreeItemPropertyValueFactory<>("btn"));
         loadItemTable();
 
+
         tblItem.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             try {
-                setData(newValue.getValue());
+                if (newValue != null && newValue.getValue() != null) {
+                setData(newValue.getValue());}
             } catch (NullPointerException ex) {
                 ex.printStackTrace();
             }
 
         });
+
+
+
 
         txtSearch.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -115,27 +128,23 @@ public class ItemFormController {
 
     private void loadItemTable() {
         ObservableList<ItemTm> tmList = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM Item";
-
         try {
-            Statement stm = DBConnection.getInstance().getConnection().createStatement();
-            ResultSet result = stm.executeQuery(sql);
-
-            while (result.next()){
+            List<ItemDto> dtoList = itemBo.allItems();
+            for (ItemDto dto:dtoList ){
                 JFXButton btn = new JFXButton("Delete");
                 btn.setBackground(Background.fill(Paint.valueOf("red")));
-                ItemTm item = new ItemTm(
-                        result.getString(1),
-                        result.getString(2),
-                        result.getDouble(3),
-                        result.getInt(4),
+
+                ItemTm c = new ItemTm(
+                        dto.getCode(),
+                        dto.getDesc(),
+                        dto.getUnitPrice(),
+                        dto.getQty(),
                         btn
                 );
                 btn.setOnAction(actionEvent -> {
-                    deleteItem(item.getCode());
+                    deleteItem(c.getCode());
                 });
-
-                tmList.add(item);
+                tmList.add(c);
             }
             TreeItem<ItemTm> treeItem = new RecursiveTreeItem<ItemTm>(tmList, RecursiveTreeObject::getChildren);
             tblItem.setRoot(treeItem);
@@ -145,15 +154,12 @@ public class ItemFormController {
             e.printStackTrace();
         }
     }
-
     private void deleteItem(String code) {
-        String sql = "DELETE from item WHERE code=?";
+
 
         try {
-            PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
-            pstm.setString(1, code);
-            int result = pstm.executeUpdate();
-            if (result>0){
+            boolean isDeleted = itemBo.deleteItem(code);
+            if (isDeleted){
                 new Alert(Alert.AlertType.INFORMATION,"Item Deleted!").show();
                 loadItemTable();
                 clearFields();
@@ -178,22 +184,16 @@ public class ItemFormController {
         }
     }
     @FXML
-    void saveButtonOnAction(ActionEvent event) {
-        ItemDto dto = new ItemDto(txtCode.getText(),
-                txtDesc.getText(),
-                Double.parseDouble(txtUnitPrice.getText()),
-                Integer.parseInt(txtQty.getText())
-        );
-       String sql = "INSERT INTO item VALUES(?,?,?,?)";
-
+    void saveButtonOnAction(ActionEvent event){
         try {
-            PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
-            pstm.setString(1, dto.getCode());
-            pstm.setString(2, dto.getDesc());
-            pstm.setDouble(3, dto.getUnitPrice());
-            pstm.setInt(4, dto.getQty());
-            int result = pstm.executeUpdate();
-            if (result>0){
+            boolean isSaved = itemBo.saveItem(new ItemDto(txtCode.getText(),
+                    txtDesc.getText(),
+                    Double.parseDouble(txtUnitPrice.getText()),
+                    Integer.parseInt(txtQty.getText())
+            ));
+
+
+            if (isSaved){
                 new Alert(Alert.AlertType.INFORMATION, "Item Saved!").show();
                 loadItemTable();
                 clearFields();
@@ -205,7 +205,7 @@ public class ItemFormController {
         }catch (SQLIntegrityConstraintViolationException ex){
             new Alert(Alert.AlertType.ERROR,"Duplicate Entry").show();
         }catch (ClassNotFoundException | SQLException e){
-            System.out.println();
+            e.printStackTrace();
         }
     }
     private void clearFields() {
@@ -220,22 +220,14 @@ public class ItemFormController {
 
     @FXML
     void updateButtonOnAction(ActionEvent event) {
-        ItemDto dto = new ItemDto(txtCode.getText(),
-                txtDesc.getText(),
-                Double.parseDouble(txtUnitPrice.getText()),
-                Integer.parseInt(txtQty.getText())
-        );
-        String sql = "UPDATE Item SET Description=?, UnitPrice=?, qtyOnHand=? WHERE code=?";
-
         try {
-            PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
-            pstm.setString(1, dto.getDesc());
-            pstm.setDouble(2, dto.getUnitPrice());
-            pstm.setInt(3, dto.getQty());
-            pstm.setString(4, dto.getCode());
+            boolean isUpdated = itemBo.updateItem(new ItemDto(txtCode.getText(),
+                    txtDesc.getText(),
+                    Double.parseDouble(txtUnitPrice.getText()),
+                    Integer.parseInt(txtQty.getText())
+            ));
 
-            int result = pstm.executeUpdate();
-            if (result>0){
+            if (isUpdated){
                 new Alert(Alert.AlertType.INFORMATION, "Item Updated!").show();
                 loadItemTable();
                 clearFields();
@@ -247,7 +239,7 @@ public class ItemFormController {
         }catch (SQLIntegrityConstraintViolationException ex){
             new Alert(Alert.AlertType.ERROR,"Duplicate Entry").show();
         }catch (ClassNotFoundException | SQLException e){
-            System.out.println();
+            e.printStackTrace();
         }
     }
 

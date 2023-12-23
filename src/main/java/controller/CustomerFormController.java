@@ -2,7 +2,7 @@ package controller;
 
 import bo.BoFactory;
 import bo.custom.CustomerBo;
-import bo.custom.impl.CustomerBoImpl;
+
 import com.jfoenix.controls.JFXButton;
 import dao.util.BoType;
 import javafx.collections.FXCollections;
@@ -16,8 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import dto.CustomerDto;
 import dto.tm.CustomerTm;
-import dao.custom.CustomerDao;
-import dao.custom.impl.CustomerDaoImpl;
+
 
 import java.io.IOException;
 import java.sql.*;
@@ -149,7 +148,7 @@ public class CustomerFormController {
         }catch (SQLIntegrityConstraintViolationException ex){
             new Alert(Alert.AlertType.ERROR,"Duplicate Entry").show();
         }catch (ClassNotFoundException | SQLException e){
-            System.out.println();
+            e.printStackTrace();
         }
     }
 

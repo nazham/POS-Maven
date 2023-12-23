@@ -1,6 +1,8 @@
 package bo;
 
 import bo.custom.impl.CustomerBoImpl;
+import bo.custom.impl.ItemBoImpl;
+import dao.custom.impl.OrderDaoImpl;
 import dao.util.BoType;
 
 public class BoFactory {
@@ -14,7 +16,9 @@ public class BoFactory {
     public <T extends SuperBo>T getBo(BoType type){
         switch (type){
             case CUSTOMER: return (T) new CustomerBoImpl();
-//            case ITEM: return (T) new ItemBoImpl();
+            case ITEM: return (T) new ItemBoImpl();
+//            case ORDER: return (T) new OrderBoImpl();
+//            case ORDER_DETAIL: return (T) new OrderDetailsBoImpl();
         }
         return null;
     }

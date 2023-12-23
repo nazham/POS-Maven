@@ -1,8 +1,10 @@
 package dao.custom.impl;
 
+import dao.util.CrudUtil;
 import db.DBConnection;
 import dto.ItemDto;
 import dao.custom.ItemDao;
+import entity.Item;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,21 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDaoImpl implements ItemDao {
-    @Override
-    public boolean saveItem(ItemDto Dto) {
-        return false;
-    }
-
-    @Override
-    public boolean updateItem(ItemDto Dto) {
-        return false;
-    }
-
-    @Override
-    public boolean deleteItem(String code) {
-        return false;
-    }
-
     @Override
     public ItemDto getItem(String code) throws SQLException, ClassNotFoundException {
         String sql = "SELECT * FROM item WHERE code=?";
@@ -44,14 +31,50 @@ public class ItemDaoImpl implements ItemDao {
         return null;
     }
 
+//    @Override
+//    public List<ItemDto> allItems() throws SQLException, ClassNotFoundException {
+//        List<ItemDto> list = new ArrayList<>();
+//        String sql = "SELECT * FROM item";
+//        PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
+//        ResultSet resultSet = pstm.executeQuery();
+//        while (resultSet.next()){
+//            list.add(new ItemDto(
+//                    resultSet.getString(1),
+//                    resultSet.getString(2),
+//                    resultSet.getDouble(3),
+//                    resultSet.getInt(4)
+//
+//            ));
+//        }
+//        return list;
+//    }
+
     @Override
-    public List<ItemDto> allItems() throws SQLException, ClassNotFoundException {
-        List<ItemDto> list = new ArrayList<>();
+    public boolean save(Item entity) throws SQLException, ClassNotFoundException {
+        String sql = "INSERT INTO item VALUES(?,?,?,?)";
+
+        return CrudUtil.execute(sql,entity.getCode(),entity.getDescription(),entity.getUnitPrice(),entity.getQtyOnHand());
+    }
+
+    @Override
+    public boolean update(Item entity) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE Item SET Description=?, UnitPrice=?, qtyOnHand=? WHERE code=?";
+        return CrudUtil.execute(sql, entity.getDescription(),entity.getUnitPrice(),entity.getQtyOnHand(),entity.getCode());
+    }
+
+    @Override
+    public boolean delete(String value) throws SQLException, ClassNotFoundException {
+        String sql = "DELETE from item WHERE code=?";
+        return CrudUtil.execute(sql,value);
+    }
+
+    @Override
+    public List<Item> getAll() throws SQLException, ClassNotFoundException {
+        List<Item> list = new ArrayList<>();
         String sql = "SELECT * FROM item";
-        PreparedStatement pstm = DBConnection.getInstance().getConnection().prepareStatement(sql);
-        ResultSet resultSet = pstm.executeQuery();
+        ResultSet resultSet = CrudUtil.execute(sql);
         while (resultSet.next()){
-            list.add(new ItemDto(
+            list.add(new Item(
                     resultSet.getString(1),
                     resultSet.getString(2),
                     resultSet.getDouble(3),
